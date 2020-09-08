@@ -1,3 +1,5 @@
+using System;
+
 namespace testSH
 {
     class Program
@@ -6,7 +8,7 @@ namespace testSH
         {
             Console.Write("Введите ваше имя: ");
             string name = Console.ReadLine();
-            Console.WriteLine($"Зравствуйте {name}");
+            Console.WriteLine($"Здравствуйте {name}");
         }
     }
 }
