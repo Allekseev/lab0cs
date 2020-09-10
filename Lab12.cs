@@ -29,7 +29,7 @@ namespace Lab12
                 Console.WriteLine($"y = {y}");
             }
             else
-                Console.WriteLine("решение этой системы не единственно");
+                Console.WriteLine("не удовлетворяет условию |a1b2-a2b1|>=0,0001");
         }
     }
 }
