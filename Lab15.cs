@@ -11,7 +11,7 @@ namespace Lab15
             double res = 0;
             for (int i = n; i > 0; i--)
                 res = Math.Sqrt(res) + 3 * i;
-            Console.WriteLine($"b = {Math.Sqrt(res)}");
+            Console.WriteLine($"n = {Math.Sqrt(res)}");
         }
     }
 }
