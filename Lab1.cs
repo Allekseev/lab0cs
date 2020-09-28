@@ -1,6 +1,6 @@
 using System;
 
-namespace ConsoleApp1
+namespace Lab1
 {
     class Top
     {
@@ -87,12 +87,6 @@ namespace ConsoleApp1
             maxTop = new Top(x[0], y[0], z[0]);
             minTop = new Top(x[1], y[1], z[1]);
         }
-        public bool IsExist()   //проверка существует ли параллелепипед с углами min и max
-        {
-            if(maxTop.selfX > minTop.selfX && maxTop.selfY > minTop.selfY && maxTop.selfZ > minTop.selfZ)
-                return true;
-            return false;
-        }
 
         public void Move(double x, double y, double z)   //перемещение параллелепипеда
         {
@@ -103,7 +97,7 @@ namespace ConsoleApp1
         public void Resize(double x, double y, double z)   //изменение размеров параллелепипеда
         {
             maxTop.Move(x, y, z);
-            if (!IsExist())
+            if (!(maxTop.selfX > minTop.selfX && maxTop.selfY > minTop.selfY && maxTop.selfZ > minTop.selfZ))
                 throw new Exception("Нельзя уменьшить параллелепипед до нулевых/отрицательных размеров");
         }
 
@@ -195,6 +189,7 @@ namespace ConsoleApp1
                         double z = Convert.ToDouble(Console.ReadLine());
                         par.Resize(x, y, z);
                         Console.Write("Параллелепипед c изменёнными размерами");
+                        par.Read();
                     }
                     catch (Exception ex)
                     {
