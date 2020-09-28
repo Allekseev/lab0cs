@@ -1,13 +1,13 @@
 using System;
 
-namespace Lab1
+namespace ConsoleApp1
 {
-    class Angle
+    class Top
     {
-        public double selfX;
-        public double selfY;   //координаты угла
-        public double selfZ;
-        public Angle()
+        public double selfX { get; protected set; }
+        public double selfY { get; protected set; }   //координаты вершины
+        public double selfZ { get; protected set; }
+        public Top()
         {
             Console.Write("x: ");
             selfX = Convert.ToDouble(Console.ReadLine());
@@ -16,13 +16,15 @@ namespace Lab1
             Console.Write("z: ");
             selfZ = Convert.ToDouble(Console.ReadLine());
         }
-        public Angle(double x, double y, double z)
+        public Top(double x, double y, double z)
         {
             selfX = x;
             selfY = y;
             selfZ = z;
         }
-        public void Move(double x, double y, double z)   //перемещение угла
+        public static bool operator == (Top a, Top b) => (a.selfX == b.selfX) && (a.selfY == b.selfY) && (a.selfZ == b.selfZ);
+        public static bool operator != (Top a, Top b) => !(a==b);
+        public void Move(double x, double y, double z)   //перемещение вершины
         {
             selfX += x;
             selfY += y;
@@ -33,59 +35,110 @@ namespace Lab1
 
     class Parallelepiped
     {
-        public Angle max;   //координаты верхнего левого переднего угла
-        public Angle min;   //координаты нижнего правого заднего угла
+        private Top maxTop;   //координаты верхней левой передней вершины
+        private Top minTop;   //координаты нижней правой задней вершины
 
         public Parallelepiped()
         {
-            Console.WriteLine("Введите координаты угла параллелепипеда");
-            Angle a1 = new Angle();
-            Console.WriteLine("Введите координаты противоположного угла");
-            Angle a2 = new Angle();
-            Create(a1, a2);
+            double[] x = new double[2];
+            double[] y = new double[2];
+            double[] z = new double[2];
+            Top[] userTops = new Top[8];
+            Console.WriteLine("Введите координаты вершин параллелепипеда");
+            Console.WriteLine("Вершина 1:");
+            userTops[0] = new Top();
+            x[0] = userTops[0].selfX;
+            y[0] = userTops[0].selfY;
+            z[0] = userTops[0].selfZ;
+            for(int i = 1; i < 8; i++)
+            {
+                Console.WriteLine($"Вершина {i+1}:");
+                userTops[i] = new Top();
+                if (userTops[i].selfX != x[0])
+                    x[1] = userTops[i].selfX;
+                if (userTops[i].selfY != y[0])
+                    y[1] = userTops[i].selfY;
+                if (userTops[i].selfZ !=z[0])
+                    z[1] = userTops[i].selfZ;
+            }
+            minTop = new Top(Math.Min(x[0], x[1]), Math.Min(y[0], y[1]), Math.Min(y[0], y[1]));
+            maxTop = new Top(Math.Max(x[0], x[1]), Math.Max(y[0], y[1]), Math.Max(y[0], y[1]));
+            Top[] expectedTops = All();
+            if (! IsEqual(userTops, expectedTops))
+                throw new Exception("Введенные вершины не образуют прямоугольный параллелограмм");
         }
-        public void Create(Angle a1, Angle a2)   //нахождение угла max и угла min
+        public void Create(Top a1, Top a2)   //нахождение вершин maxTop и угла minTop
         {
-            max = new Angle(Math.Max(a1.selfX, a2.selfX), Math.Max(a1.selfY, a2.selfY), Math.Max(a1.selfZ, a2.selfZ));
-            min = new Angle(Math.Min(a1.selfX, a2.selfX), Math.Min(a1.selfY, a2.selfY), Math.Min(a1.selfZ, a2.selfZ));
+            maxTop = new Top(Math.Max(a1.selfX, a2.selfX), Math.Max(a1.selfY, a2.selfY), Math.Max(a1.selfZ, a2.selfZ));
+            minTop = new Top(Math.Min(a1.selfX, a2.selfX), Math.Min(a1.selfY, a2.selfY), Math.Min(a1.selfZ, a2.selfZ));
         }
 
         private double[] Intersection(double maxA, double minA, double maxB, double minB)
         {
             if (minA >= maxB || minB >= maxA)
-                return new double[] {0,0};
+                throw new Exception("Нет пересечения");
             return new double[] { Math.Min(maxA, maxB), Math.Max(minA, minB) };
         }
         public Parallelepiped(Parallelepiped p1, Parallelepiped p2)   //новый параллелепипед из пересечения двух других
         {
-            double[] x = Intersection(p1.max.selfX, p1.min.selfX, p2.max.selfX, p2.min.selfX);
-            double[] y = Intersection(p1.max.selfY, p1.min.selfY, p2.max.selfY, p2.min.selfY);
-            double[] z = Intersection(p1.max.selfZ, p1.min.selfZ, p2.max.selfZ, p2.min.selfZ);
-            max = new Angle(x[0], y[0], z[0]);
-            min = new Angle(x[1], y[1], z[1]);
+            double[] x = Intersection(p1.maxTop.selfX, p1.minTop.selfX, p2.maxTop.selfX, p2.minTop.selfX);
+            double[] y = Intersection(p1.maxTop.selfY, p1.minTop.selfY, p2.maxTop.selfY, p2.minTop.selfY);
+            double[] z = Intersection(p1.maxTop.selfZ, p1.minTop.selfZ, p2.maxTop.selfZ, p2.minTop.selfZ);
+            maxTop = new Top(x[0], y[0], z[0]);
+            minTop = new Top(x[1], y[1], z[1]);
         }
         public bool IsExist()   //проверка существует ли параллелепипед с углами min и max
         {
-            if(max.selfX > min.selfX && max.selfY > min.selfY && max.selfZ > min.selfZ)
+            if(maxTop.selfX > minTop.selfX && maxTop.selfY > minTop.selfY && maxTop.selfZ > minTop.selfZ)
                 return true;
             return false;
         }
 
         public void Move(double x, double y, double z)   //перемещение параллелепипеда
         {
-            max.Move(x, y, z);
-            min.Move(x, y, z);
+            maxTop.Move(x, y, z);
+            minTop.Move(x, y, z);
         }
 
         public void Resize(double x, double y, double z)   //изменение размеров параллелепипеда
         {
-            max.Move(x, y, z);
+            maxTop.Move(x, y, z);
+            if (!IsExist())
+                throw new Exception("Нельзя уменьшить параллелепипед до нулевых/отрицательных размеров");
         }
 
-        public void Read()   //вывод на консоль координат углов min и max параллелепипеда
+        private Top[] All()
         {
-            Console.WriteLine($"координаты угла1 - x:{max.selfX} y:{max.selfY} z:{max.selfZ}");
-            Console.WriteLine($"координаты угла2 - x:{min.selfX} y:{min.selfY} z:{min.selfZ}");
+            Top[] allTops = new Top[8];
+            allTops[0] = minTop;
+            allTops[1] = new Top(minTop.selfX, minTop.selfY, maxTop.selfZ);
+            allTops[2] = new Top(minTop.selfX, maxTop.selfY, minTop.selfZ);
+            allTops[3] = new Top(minTop.selfX, maxTop.selfY, maxTop.selfZ);
+            allTops[4] = new Top(maxTop.selfX, minTop.selfY, minTop.selfZ);
+            allTops[5] = new Top(maxTop.selfX, minTop.selfY, maxTop.selfZ);
+            allTops[6] = new Top(maxTop.selfX, maxTop.selfY, minTop.selfZ);
+            allTops[7] = maxTop;
+            return allTops;
+        }
+
+        private bool IsEqual(Top[] userTops, Top[] expectedTops)
+        {
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++)
+                {
+                    if (expectedTops[i] == userTops[j])
+                        break;
+                    if (j == 7)
+                        return false;
+                }
+            return true;
+        }
+
+        public void Read()   //вывод на консоль координат вершин параллелепипеда
+        {
+            Top[] tops = All();
+            for (int i = 0; i < 8; i++)
+                Console.WriteLine($"координаты вершины {i+1} - x:{tops[i].selfX} y:{tops[i].selfY} z:{tops[i].selfZ}");
         }
     }
 
@@ -109,10 +162,9 @@ namespace Lab1
                     break;
                 if (str == "1")
                 {
-                    Parallelepiped par = new Parallelepiped();
-                    par.Read();
-                    if (par.IsExist())
+                    try
                     {
+                        Parallelepiped par = new Parallelepiped();
                         Console.WriteLine("Введите сдвиг");
                         Console.Write("по x ");
                         double x = Convert.ToDouble(Console.ReadLine());
@@ -124,15 +176,16 @@ namespace Lab1
                         Console.WriteLine("Параллелепипед после перемещения");
                         par.Read();
                     }
-                    else
-                        Console.WriteLine("такого параллелепипеда не существует");
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
                 else if (str == "2")
                 {
-                    Parallelepiped par = new Parallelepiped();
-                    par.Read();
-                    if (par.IsExist())
+                    try
                     {
+                        Parallelepiped par = new Parallelepiped();
                         Console.WriteLine("Изменение размера");
                         Console.Write("по x ");
                         double x = Convert.ToDouble(Console.ReadLine());
@@ -142,31 +195,28 @@ namespace Lab1
                         double z = Convert.ToDouble(Console.ReadLine());
                         par.Resize(x, y, z);
                         Console.Write("Параллелепипед c изменёнными размерами");
-                        if (par.IsExist())
-                        {
-                            Console.WriteLine();
-                            par.Read();
-                        }
-                        else
-                            Console.Write(" не существует");
                     }
-                    else
-                        Console.WriteLine("такого параллелепипеда не существует");
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
                 else if (str == "3")
                 {
-                    Console.WriteLine("Параллелепипед 1:");
-                    Parallelepiped par1 = new Parallelepiped();
-                    Console.WriteLine("Параллелепипед 2:");
-                    Parallelepiped par2 = new Parallelepiped();
-                    Parallelepiped par = new Parallelepiped(par1, par2);
-                    if (par.IsExist())
+                    try
                     {
+                        Console.WriteLine("Параллелепипед 1:");
+                        Parallelepiped par1 = new Parallelepiped();
+                        Console.WriteLine("Параллелепипед 2:");
+                        Parallelepiped par2 = new Parallelepiped();
+                        Parallelepiped par = new Parallelepiped(par1, par2);
                         Console.WriteLine("Пересечение:");
                         par.Read();
                     }
-                    else
-                        Console.WriteLine("Эти параллелепипеды не пересекаются");
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
                 else
                     Console.WriteLine("Допустимые варианты ввода: 0 1 2 или 3");
