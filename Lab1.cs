@@ -61,8 +61,8 @@ namespace Lab1
                 if (userTops[i].selfZ !=z[0])
                     z[1] = userTops[i].selfZ;
             }
-            minTop = new Top(Math.Min(x[0], x[1]), Math.Min(y[0], y[1]), Math.Min(y[0], y[1]));
-            maxTop = new Top(Math.Max(x[0], x[1]), Math.Max(y[0], y[1]), Math.Max(y[0], y[1]));
+            minTop = new Top(Math.Min(x[0], x[1]), Math.Min(y[0], y[1]), Math.Min(z[0], z[1]));
+            maxTop = new Top(Math.Max(x[0], x[1]), Math.Max(y[0], y[1]), Math.Max(z[0], z[1]));
             Top[] expectedTops = All();
             if (! IsEqual(userTops, expectedTops))
                 throw new Exception("Введенные вершины не образуют прямоугольный параллелограмм");
