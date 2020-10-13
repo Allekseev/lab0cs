@@ -126,10 +126,8 @@ namespace Lab3
             }
             string jsonString;
             jsonString = JsonSerializer.Serialize(rList);
-            Console.WriteLine(jsonString);
             File.WriteAllText(pathR, jsonString);
             jsonString = JsonSerializer.Serialize(nList);
-            Console.WriteLine(jsonString);
             File.WriteAllText(pathN, jsonString);
         }
         public void Load(string pathR, string pathN)
@@ -142,10 +140,8 @@ namespace Lab3
             allMids = 0;
             buildingMid = 0;
             string jsonString = File.ReadAllText(pathR);
-            Console.WriteLine(jsonString);
             rList = JsonSerializer.Deserialize<List<Residential>>(jsonString);
             jsonString = File.ReadAllText(pathN);
-            Console.WriteLine(jsonString);
             nList = JsonSerializer.Deserialize<List<NonResidential>>(jsonString);
 
             foreach (Residential r in rList)
@@ -185,7 +181,6 @@ namespace Lab3
         {
             string pathR = @"C:\Users\semen\source\repos\Lab3\Lab3\res.json";
             string pathN = @"C:\Users\semen\source\repos\Lab3\Lab3\nonRes.json";
-            Console.WriteLine(Path.GetExtension(pathR));
             Company c = new Company();
             while (true)
             {
@@ -246,9 +241,9 @@ namespace Lab3
                 else if (str == "6")
                     Console.WriteLine($"Среднее кол-во жильцов/работников здания по компании - {c.buildingMid}");
                 else if (str == "7")
-                    c.Load(pathR, pathN);
-                else if (str == "8")
                     c.Save(pathR, pathN);
+                else if (str == "8")
+                    c.Load(pathR, pathN);
                 else
                     Console.WriteLine("Допустимые варианты ввода - цифры от 0 до 8");
             }
